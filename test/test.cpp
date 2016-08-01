@@ -1,8 +1,9 @@
 #include "sudoku.h"
 
 #include <ctime>
+#include <fstream>
 #include <iostream>
-
+#include <string>
 
 void sudoku_test() {
 	std::ifstream infile("test/top95.sudoku");

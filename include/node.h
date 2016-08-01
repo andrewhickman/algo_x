@@ -7,6 +7,11 @@ struct ColNode;
 struct Node {
 public:
 	Node(RowNode* row_, ColNode* col_);
+	virtual ~Node() {
+		// Clean up pointers to this node
+		remove_from_row();
+		remove_from_col();
+	}
 
 	void remove_from_row();
 	void remove_from_col();
@@ -30,12 +35,6 @@ protected:
 	: row(row_), col(col_), left(l), right(r), above(a), below(b) {
 		replace_in_row();
 		replace_in_col();
-	}
-public:
-	virtual ~Node() {
-		// Clean up pointers to this node
-		remove_from_row();
-		remove_from_col();
 	}
 };
 

@@ -1,15 +1,10 @@
 #include "matrix.h"
 
-#include <fstream>
 #include <string>
 
-inline bool sudoku_constraints(size_t j, size_t i, std::string clues) {
+inline bool sudoku_constraints(size_t j, size_t i) {
 	size_t inum = i % 9;
-	i /= 9;
-	if ('1' <= clues[i] and clues[i] <= '9' and size_t(clues[i]) != inum + size_t('1')) {
-		return false;
-	}
-	size_t icol = i % 9;
+	size_t icol = (i /= 9) % 9;
 	size_t irow = (i /= 9) % 9;
 
 	size_t jx = j % 9;
@@ -32,7 +27,11 @@ inline bool sudoku_constraints(size_t j, size_t i, std::string clues) {
 inline std::string sudoku_solve(std::string puzzle) {
 	SparseMatrix A(729, 324,
 		[puzzle](size_t j, size_t i) -> bool {
-			return sudoku_constraints(j, i, puzzle);
+			if (puzzle[i / 9] != static_cast<char>(i % 9) + '1') {
+				return false;
+			} else {
+				return sudoku_constraints(j, i);
+			}
 		}
 	);
 	std::vector<RowNode*> solution = A.solve();
