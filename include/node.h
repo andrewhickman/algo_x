@@ -40,30 +40,26 @@ protected:
 
 struct RowNode : virtual public Node {
 	RowNode(HeadNode* head, size_t num_);
-
-	size_t num;
-
-protected:
 	RowNode() = default;
 	~RowNode() {
 		while (right != this) {
 			delete right;
 		}
 	}
+
+	size_t num;
 };
 
 struct ColNode : virtual public Node {
 	ColNode(HeadNode* head);
-
-	size_t size;
-
-protected:
 	ColNode() = default;
 	~ColNode() {
 		while (below != this) {
 			delete below;
 		}
 	}
+
+	size_t size;
 };
 
 struct HeadNode : public RowNode, public ColNode {

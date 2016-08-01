@@ -1,6 +1,5 @@
 #include "node.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <functional>
 #include <limits>
@@ -9,24 +8,24 @@
 
 struct SparseMatrix {
 	SparseMatrix(size_t height, size_t width, std::function<bool (size_t, size_t)> pred)
-	: head(new HeadNode()) {
-		std::vector<ColNode*> cols(width);
-		RowNode* row;
+	: head(new HeadNode())
+	, cols(width)
+	, rows(height) {
 		// Setup col headers
 		for (size_t j = 0; j < width; ++j) {
 			cols[j] = new ColNode(head);
 		}
 		// Fill in 1s
 		for (size_t i = 0; i < height; ++i) {
-			row = new RowNode(head, i);
+			rows[i] = new RowNode(head, i);
 			for (size_t j = 0; j < width; ++j) {
 				if (pred(j, i)) {
-					new Node(row, cols[j]);
+					new Node(rows[i], cols[j]);
 				}
 			}
 			// Empty rows are removed
-			if (row->right == row) {
-				//delete row;
+			if (rows[i]->right == rows[i]) {
+				delete rows[i];
 			}
 		}
 	}
@@ -36,28 +35,28 @@ struct SparseMatrix {
 		delete head;
 	}
 
-	void remove_row(Node* n) {
+	void remove_row(RowNode* n) {
 		for (Node* it = n->right; it != n; it = it->right) {
 			it->remove_from_col();
 		}
 		n->remove_from_col();
 	}
 
-	void remove_col(Node* n) {
+	void remove_col(ColNode* n) {
 		for (Node* it = n->below; it != n; it = it->below) {
 			it->remove_from_row();
 		}
 		n->remove_from_row();
 	}
 
-	void replace_row(Node* n) {
+	void replace_row(RowNode* n) {
 		n->replace_in_col();
 		for (Node* it = n->right; it != n; it = it->right) {
 			it->replace_in_col();
 		}
 	}
 
-	void replace_col(Node* n) {
+	void replace_col(ColNode* n) {
 		n->replace_in_row();
 		for (Node* it = n->below; it != n; it = it->below) {
 			it->replace_in_row();
@@ -98,15 +97,15 @@ struct SparseMatrix {
 				removed_cols.insert(j);
 			}
 			// Remove rows and columns containing elements we have already
-			for (Node* n : removed_cols) {
-				remove_col(n);
+			for (auto it = removed_cols.begin(); it != removed_cols.end(); ++it) {
+				remove_col(*it);
 			}
-			for (Node* n : removed_rows) {
-				remove_row(n);
+			for (auto it = removed_rows.begin(); it != removed_rows.end(); ++it) {
+				remove_row(*it);
 			}
 			// Recursively apply the algorithm to the reduced SparseMatrix
 			result = iterate(solution);
-			// Replaced the removed rows and columns
+			// Replace the removed rows and columns
 			for (auto it = removed_rows.rbegin(); it != removed_rows.rend(); ++it) {
 				replace_row(*it);
 			}
@@ -130,4 +129,6 @@ struct SparseMatrix {
 	}
 
 	HeadNode* head;
+	std::vector<ColNode*> cols;
+	std::vector<RowNode*> rows;
 };
