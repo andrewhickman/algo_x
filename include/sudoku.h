@@ -27,7 +27,9 @@ inline bool sudoku_constraints(size_t j, size_t i) {
 inline std::string sudoku_solve(std::string puzzle) {
 	SparseMatrix A(729, 324,
 		[puzzle](size_t j, size_t i) -> bool {
-			if (puzzle[i / 9] != static_cast<char>(i % 9) + '1') {
+			char clue = puzzle[i / 9];
+			if ('1' <= clue and clue <= '9' and
+				puzzle[i / 9] != static_cast<char>(i % 9) + '1') {
 				return false;
 			} else {
 				return sudoku_constraints(j, i);
