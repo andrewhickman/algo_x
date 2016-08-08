@@ -1,7 +1,6 @@
 #include "node.h"
 
 #include <cstdlib>
-#include <iostream>
 #include <functional>
 #include <limits>
 #include <set>
