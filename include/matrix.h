@@ -86,8 +86,8 @@ struct SparseMatrix {
 		std::set<RowNode*> removed_rows;
 		std::set<ColNode*> removed_cols;
 		bool result;
-		//c = min_col();
-		c = head->right->col;
+		c = min_col();
+		//c = head->right->col;
 		for (Node* trial = c->below; trial != c; trial = trial->below) {
 			r = trial->row;
 			for (Node* obj = r->right; obj != r; obj = obj->right) {
