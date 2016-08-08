@@ -15,8 +15,9 @@ void sudoku_test() {
 	for (std::string puzzle; std::getline(infile, puzzle);) {
 		outfile << sudoku::solve(puzzle) << '\n';
 		++count;
-	}*/
-	count = sudoku::solve_file(infile, outfile);
+	}
+	*/
+	count += sudoku::solve_file(infile, outfile);
 	double dt = double(clock() - t1) / CLOCKS_PER_SEC;
 	if (count != 0) {
 		std::cout << "Solved " << count << " sudoku puzzles in " << dt << " seconds\n";

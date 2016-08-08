@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <functional>
 #include <limits>
 #include <set>
@@ -85,7 +86,8 @@ struct SparseMatrix {
 		std::set<RowNode*> removed_rows;
 		std::set<ColNode*> removed_cols;
 		bool result;
-		c = min_col();
+		//c = min_col();
+		c = head->right->col;
 		for (Node* trial = c->below; trial != c; trial = trial->below) {
 			r = trial->row;
 			for (Node* obj = r->right; obj != r; obj = obj->right) {
@@ -103,6 +105,7 @@ struct SparseMatrix {
 			for (auto it = removed_rows.begin(); it != removed_rows.end(); ++it) {
 				remove_row(*it);
 			}
+			//std::cout << removed_cols.size() << ' ' << removed_rows.size() << '\n';
 			// Recursively apply the algorithm to the reduced SparseMatrix
 			result = iterate(solution);
 			// Replace the removed rows and columns

@@ -1,39 +1,25 @@
 #include "matrix.h"
 
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>
 
 namespace sudoku {
 
-inline int get_num(char c) {
+const size_t MATRIX_W = 324;
+const size_t MATRIX_H = 729;
+
+inline int get_num(const char c) {
 	return static_cast<int>(c - '1');
 }
 
-inline char get_char(int n) {
+inline char get_char(const int n) {
 	return static_cast<char>(n) + '1';
 }
 
-inline bool is_clue(int n) {
+inline bool is_clue(const int n) {
 	return 0 <= n and n < 9;
-}
-
-inline std::string format_solution(const std::vector<RowNode*>& solution) {
-	std::string ret;
-	static int grid[9][9];
-	for (RowNode* n : solution) {
-		size_t i = n->num;
-		size_t num = (i % 9);
-		size_t col = (i /= 9) % 9;
-		size_t row = (i /= 9) % 9;
-		grid[row][col] = num;
-	}
-	for (size_t i = 0; i < 9; ++i) {
-		for (size_t j = 0; j < 9; ++j) {
-			ret += get_char(grid[i][j]);
-		}
-	}
-	return ret;
 }
 
 inline bool constraints(size_t j, size_t i) {
@@ -58,8 +44,30 @@ inline bool constraints(size_t j, size_t i) {
 	return false;    // unused
 }
 
-inline std::string solve(std::string puzzle) {
-	SparseMatrix M(729, 324,
+inline std::string format_solution(const std::vector<RowNode*>& solution) {
+	std::string ret;
+	if (solution.empty()) {
+		return ret;
+	}
+	static int grid[9][9];
+	for (RowNode* n : solution) {
+		size_t i = n->num;
+		size_t num = (i % 9);
+		size_t col = (i /= 9) % 9;
+		size_t row = (i /= 9) % 9;
+		grid[row][col] = num;
+	}
+	for (size_t i = 0; i < 9; ++i) {
+		for (size_t j = 0; j < 9; ++j) {
+			ret += get_char(grid[i][j]);
+		}
+	}
+	return ret;
+}
+
+inline std::string solve(const std::string& puzzle) {
+	/* Solve a sudoku puzzle given as a string of length 81 */
+	SparseMatrix M(MATRIX_H, MATRIX_W,
 		[puzzle](size_t j, size_t i) -> bool {
 			int c = get_num(puzzle[i / 9]);
 			if (is_clue(c) and c != (i % 9)) {
@@ -69,16 +77,19 @@ inline std::string solve(std::string puzzle) {
 			}
 		}
 	);
-	std::vector<RowNode*> solution = M.solve();
-	return format_solution(solution);
+	return format_solution(M.solve());
 }
 
 inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 	/* Faster than the basic solve routine for multiple puzzles */
-	SparseMatrix M(729, 324, constraints);
-	int count = 0;
+	SparseMatrix M(MATRIX_H, MATRIX_W, constraints);
+	int line_count = 0;
 	std::vector<RowNode*> clues;
-	for (std::string puzzle; std::getline(infile, puzzle); ++count) {
+	for (std::string puzzle; std::getline(infile, puzzle);) {
+		if (puzzle.size() != 81) {
+			continue;
+		}
+		++line_count;
 		// Get clues
 		for (int i = 0; i < 81; ++i) {
 			int c = get_num(puzzle[i]);
@@ -101,7 +112,7 @@ inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 		}
 		clues.clear();
 	}
-	return count;
+	return line_count;
 }
 
 } // namespace sudoku
