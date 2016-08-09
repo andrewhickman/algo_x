@@ -1,5 +1,5 @@
-#CC := g++
-CC := clang++-3.8 -stdlib=libstdc++ 
+CC := g++
+#CC := clang++-3.8# -stdlib=libc++ 
 SRCDIR := source
 BUILDDIR := build
 TARGET := bin/a.out
@@ -7,7 +7,7 @@ TARGET := bin/a.out
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -g
+CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -O3
 LIB :=
 INC := -I include
 

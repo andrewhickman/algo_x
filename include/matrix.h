@@ -1,3 +1,6 @@
+#ifndef _matrix_h_
+#define _matrix_h_
+
 #include "node.h"
 
 #include <cstdlib>
@@ -77,6 +80,7 @@ struct SparseMatrix {
 	}
 
 	bool iterate(std::vector<RowNode*>& solution) {
+	/* Find a solution to the exact cover problem. Halts after solution is found */
 		if (head->right == head) {
 			return true;
 		}
@@ -122,9 +126,60 @@ struct SparseMatrix {
 		return false;
 	}
 
+	void iterate_all(std::vector<std::vector<RowNode*>>& solutions) {
+	/* Find all solutions to the exact cover problem. */
+		static std::vector<RowNode*> current_solution;
+		if (head->right == head) {
+			solutions.push_back(current_solution);
+			return;
+		}
+		RowNode* r, * i;
+		ColNode* c, * j;
+		std::set<RowNode*> removed_rows;
+		std::set<ColNode*> removed_cols;
+		c = min_col();
+		for (Node* trial = c->below; trial != c; trial = trial->below) {
+			r = trial->row;
+			for (Node* obj = r->right; obj != r; obj = obj->right) {
+				j = obj->col;
+				for (Node* set = j->below; set != j; set = set->below) {
+					i = set->row;
+					removed_rows.insert(i);
+				}
+				removed_cols.insert(j);
+			}
+			// Remove rows and columns containing elements we have already
+			for (auto it = removed_cols.begin(); it != removed_cols.end(); ++it) {
+				remove_col(*it);
+			}
+			for (auto it = removed_rows.begin(); it != removed_rows.end(); ++it) {
+				remove_row(*it);
+			}
+			// Recursively apply the algorithm to the reduced SparseMatrix
+			current_solution.push_back(r);
+			iterate_all(solutions);
+			current_solution.pop_back();
+			// Replace the removed rows and columns
+			for (auto it = removed_rows.rbegin(); it != removed_rows.rend(); ++it) {
+				replace_row(*it);
+			}
+			removed_rows.clear();
+			for (auto it = removed_cols.rbegin(); it != removed_cols.rend(); ++it) {
+				replace_col(*it);
+			}
+			removed_cols.clear();
+		}
+	}
+
 	std::vector<RowNode*> solve() {
 		std::vector<RowNode*> ret;
 		iterate(ret);
+		return ret;
+	}
+
+	std::vector<std::vector<RowNode*>> solve_all() {
+		std::vector<std::vector<RowNode*>> ret;
+		iterate_all(ret);
 		return ret;
 	}
 
@@ -132,3 +187,5 @@ struct SparseMatrix {
 	std::vector<ColNode*> cols;
 	std::vector<RowNode*> rows;
 };
+
+#endif

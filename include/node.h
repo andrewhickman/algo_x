@@ -1,3 +1,6 @@
+#ifndef _node_h_
+#define _node_h_
+
 #include <cstdlib>
 
 struct HeadNode;
@@ -110,3 +113,5 @@ void Node::replace_in_col() {
 	below->above = this;
 	++col->size;
 }
+
+#endif
