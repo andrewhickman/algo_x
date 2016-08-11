@@ -76,14 +76,15 @@ bool SparseMatrix::iterate(std::vector<HeadNode*>& solution) {
 	if (head->right == head) {
 		return true;
 	}
-	HeadNode* r, * i;
-	HeadNode* c, * j;
+	HeadNode *r, *i;
+	HeadNode *c, *j;
 	std::set<HeadNode*> removed_rows;
 	std::set<HeadNode*> removed_cols;
 	bool result;
 	c = min_col();
 	for (Node* trial = c->below; trial != c; trial = trial->below) {
 		r = trial->row;
+		// Find rows and columns to remove
 		for (Node* obj = r->right; obj != r; obj = obj->right) {
 			j = obj->col;
 			for (Node* set = j->below; set != j; set = set->below) {
@@ -123,13 +124,14 @@ void SparseMatrix::iterate_all(std::vector<std::vector<HeadNode*>>& solutions) {
 		solutions.push_back(current_solution);
 		return;
 	}
-	HeadNode* r, * i;
-	HeadNode* c, * j;
+	HeadNode *r, *i;
+	HeadNode *c, *j;
 	std::set<HeadNode*> removed_rows;
 	std::set<HeadNode*> removed_cols;
 	c = min_col();
 	for (Node* trial = c->below; trial != c; trial = trial->below) {
 		r = trial->row;
+		// Find rows and columns to remove
 		for (Node* obj = r->right; obj != r; obj = obj->right) {
 			j = obj->col;
 			for (Node* set = j->below; set != j; set = set->below) {

@@ -23,8 +23,8 @@ struct SparseMatrix {
 	void replace_row(HeadNode* n);
 	HeadNode* min_col() const;
 
-	bool iterate(std::vector<HeadNode*>& solution) {
-	void iterate_all(std::vector<std::vector<HeadNode*>>& solutions) {
+	bool iterate(std::vector<HeadNode*>& solution);
+	void iterate_all(std::vector<std::vector<HeadNode*>>& solutions);
 
 	std::vector<HeadNode*> solve() {
 /* Find a single solution to the exact cover problem. */

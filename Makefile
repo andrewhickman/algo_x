@@ -7,7 +7,7 @@ TARGET := bin/a.out
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -O3
+CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -ferror-limit=5 -O3
 LIB := 
 INC := -I include
 
