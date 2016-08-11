@@ -8,12 +8,10 @@ SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -ferror-limit=5 -O3
-LIB := 
+LIB := $(OBJECTS)
 INC := -I include
 
 $(TARGET): $(OBJECTS)
-	@echo "Linking..."
-	$(CC) $^ -o $(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
