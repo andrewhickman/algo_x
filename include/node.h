@@ -27,37 +27,16 @@ protected:
 
 class HeadNode : public Node {
 public:
-	HeadNode()
-	: Node(this, this, this, this, this, this)
-	, data(0) {
-	}
-	HeadNode(HeadNode *row_)
-	: Node(this, row_, this, this, row_->left, row_)
-	, data(0) {
-	}
-	HeadNode(HeadNode *col_, size_t data_) 
-	: Node(col_, this, col_->above, col_, this, this)
-	, data(data_) {
-	}
-	~HeadNode() {
-		if (is_col()) {
-			while (below != this) {
-				delete below;
-			}
-		}
-	}
+	HeadNode();                                // Head constructor
+	HeadNode(HeadNode *row_);                  // Col constructor
+	HeadNode(HeadNode *col_, size_t data_);    // Row constructor
+	~HeadNode(); 
 
 	size_t data;
 
-	bool is_col() const {
-		return col == this;
-	}
-	bool is_row() const {
-		return row == this;
-	}
-	bool is_head() const {
-		return is_col() and is_row();
-	}
+	bool is_col() const;
+	bool is_row() const;
+	bool is_head() const;
 };
 
 #endif
