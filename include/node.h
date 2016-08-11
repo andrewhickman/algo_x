@@ -2,116 +2,63 @@
 #define _node_h_
 
 #include <cstdlib>
+#include <iostream>
 
-struct HeadNode;
-struct RowNode;
-struct ColNode;
+class HeadNode;
 
-struct Node {
+class Node {
 public:
-	Node(RowNode* row_, ColNode* col_);
-	virtual ~Node() {
-		// Clean up pointers to this node
-		remove_from_row();
-		remove_from_col();
-	}
+	Node(HeadNode *col_, HeadNode *row_);
+	~Node();
 
-	void remove_from_row();
+	HeadNode *const col, *const row;
+	Node *above, *below, *left, *right;
+
 	void remove_from_col();
-	void replace_in_row();
+	void remove_from_row(); 
 	void replace_in_col();
-
-	RowNode* row;
-	ColNode* col;
-	Node* left, * right, * above, * below;
+	void replace_in_row();
 
 protected:
-	Node()
-	: row(nullptr)
-	, col(nullptr)
-	, left(this)
-	, right(this)
-	, above(this)
-	, below(this) {
-	}
-	Node(RowNode* row_, ColNode* col_, Node* l, Node* r, Node* a, Node* b)
-	: row(row_), col(col_), left(l), right(r), above(a), below(b) {
-		replace_in_row();
-		replace_in_col();
-	}
+	Node(HeadNode *col_, HeadNode *row_,
+	     Node *above_, Node *below_,
+	     Node *left, Node *right);
 };
 
-struct RowNode : virtual public Node {
-	RowNode(HeadNode* head, size_t num_);
-	RowNode() = default;
-	~RowNode() {
-		while (right != this) {
-			delete right;
+class HeadNode : public Node {
+public:
+	HeadNode()
+	: Node(this, this, this, this, this, this)
+	, data(0) {
+	}
+	HeadNode(HeadNode *row_)
+	: Node(this, row_, this, this, row_->left, row_)
+	, data(0) {
+	}
+	HeadNode(HeadNode *col_, size_t data_) 
+	: Node(col_, this, col_->above, col_, this, this)
+	, data(data_) {
+	}
+	~HeadNode() {
+		if (is_col()) {
+			while (below != this) {
+				delete below;
+			}
 		}
 	}
 
-	size_t num;
-};
+	size_t data;
 
-struct ColNode : virtual public Node {
-	ColNode(HeadNode* head);
-	ColNode() = default;
-	~ColNode() {
-		while (below != this) {
-			delete below;
-		}
+	bool is_col() const {
+		return col == this;
 	}
-
-	size_t size;
-};
-
-struct HeadNode : public RowNode, public ColNode {
-	HeadNode() {
-		row = this;
-		col = this;
+	bool is_row() const {
+		return row == this;
+	}
+	bool is_head() const {
+		return is_col() and is_row();
 	}
 };
-
-RowNode::RowNode(HeadNode* head, size_t num_)
-: Node(this, head, this, this, head->above, head)
-, num(num_) {
-}
-
-ColNode::ColNode(HeadNode* head)
-: Node(head, this, head->left, head, this, this)
-, size(0) {
-}
-
-Node::Node(RowNode* row_, ColNode* col_)
-: row(row_), col(col_)    // Element is added at end of row and col
-, left(row->left)
-, right(row)
-, above(col->above)
-, below(col) {
-	replace_in_row();
-	replace_in_col();
-}
-
-void Node::remove_from_row() {
-	left->right = right;
-	right->left = left;
-}
-
-void Node::remove_from_col() {
-	above->below = below;
-	below->above = above;
-	--col->size;
-}
-
-void Node::replace_in_row() {
-	left->right = this;
-	right->left = this;
-}
-
-void Node::replace_in_col() {
-	above->below = this;
-	below->above = this;
-	++col->size;
-}
 
 #endif
+

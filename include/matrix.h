@@ -16,14 +16,14 @@ struct SparseMatrix {
 	, rows(height) {
 		// Setup col headers
 		for (size_t j = 0; j < width; ++j) {
-			cols[j] = new ColNode(head);
+			cols[j] = new HeadNode(head);
 		}
-		// Fill in 1s
+		// Fill in rows 
 		for (size_t i = 0; i < height; ++i) {
-			rows[i] = new RowNode(head, i);
+			rows[i] = new HeadNode(head, i);
 			for (size_t j = 0; j < width; ++j) {
 				if (pred(j, i)) {
-					new Node(rows[i], cols[j]);
+					new Node(cols[j], rows[i]);
 				}
 			}
 			// Empty rows are removed
@@ -35,42 +35,45 @@ struct SparseMatrix {
 
 	~SparseMatrix() {
 	// Note all rows and cols must be replaced before destruction to avoid memory leaks
+		for (HeadNode* col : cols) {
+			delete col;
+		}
 		delete head;
 	}
 
-	void remove_row(RowNode* n) {
+	void remove_row(HeadNode* n) {
 		for (Node* it = n->right; it != n; it = it->right) {
 			it->remove_from_col();
 		}
 		n->remove_from_col();
 	}
 
-	void remove_col(ColNode* n) {
+	void remove_col(HeadNode* n) {
 		for (Node* it = n->below; it != n; it = it->below) {
 			it->remove_from_row();
 		}
 		n->remove_from_row();
 	}
 
-	void replace_row(RowNode* n) {
+	void replace_row(HeadNode* n) {
 		n->replace_in_col();
 		for (Node* it = n->right; it != n; it = it->right) {
 			it->replace_in_col();
 		}
 	}
 
-	void replace_col(ColNode* n) {
+	void replace_col(HeadNode* n) {
 		n->replace_in_row();
 		for (Node* it = n->below; it != n; it = it->below) {
 			it->replace_in_row();
 		}
 	}
 
-	ColNode* min_col() const {
-		ColNode* ret = head->right->col;
-		size_t result, min = ret->size;
-		for (ColNode* col = head->right->col; col != head; col = col->right->col) {
-			result = col->col->size;
+	HeadNode* min_col() const {
+		HeadNode* ret = head->right->col;
+		size_t result, min = ret->data;
+		for (HeadNode* col = head->right->col; col != head; col = col->right->col) {
+			result = col->col->data;
 			if (result < min) {
 				ret = col;
 				min = result;
@@ -79,15 +82,15 @@ struct SparseMatrix {
 		return ret;
 	}
 
-	bool iterate(std::vector<RowNode*>& solution) {
+	bool iterate(std::vector<HeadNode*>& solution) {
 	/* Find a solution to the exact cover problem. Halts after solution is found */
 		if (head->right == head) {
 			return true;
 		}
-		RowNode* r, * i;
-		ColNode* c, * j;
-		std::set<RowNode*> removed_rows;
-		std::set<ColNode*> removed_cols;
+		HeadNode* r, * i;
+		HeadNode* c, * j;
+		std::set<HeadNode*> removed_rows;
+		std::set<HeadNode*> removed_cols;
 		bool result;
 		c = min_col();
 		for (Node* trial = c->below; trial != c; trial = trial->below) {
@@ -126,17 +129,17 @@ struct SparseMatrix {
 		return false;
 	}
 
-	void iterate_all(std::vector<std::vector<RowNode*>>& solutions) {
+	void iterate_all(std::vector<std::vector<HeadNode*>>& solutions) {
 	/* Find all solutions to the exact cover problem. */
-		static std::vector<RowNode*> current_solution;
+		static std::vector<HeadNode*> current_solution;
 		if (head->right == head) {
 			solutions.push_back(current_solution);
 			return;
 		}
-		RowNode* r, * i;
-		ColNode* c, * j;
-		std::set<RowNode*> removed_rows;
-		std::set<ColNode*> removed_cols;
+		HeadNode* r, * i;
+		HeadNode* c, * j;
+		std::set<HeadNode*> removed_rows;
+		std::set<HeadNode*> removed_cols;
 		c = min_col();
 		for (Node* trial = c->below; trial != c; trial = trial->below) {
 			r = trial->row;
@@ -171,21 +174,21 @@ struct SparseMatrix {
 		}
 	}
 
-	std::vector<RowNode*> solve() {
-		std::vector<RowNode*> ret;
+	std::vector<HeadNode*> solve() {
+		std::vector<HeadNode*> ret;
 		iterate(ret);
 		return ret;
 	}
 
-	std::vector<std::vector<RowNode*>> solve_all() {
-		std::vector<std::vector<RowNode*>> ret;
+	std::vector<std::vector<HeadNode*>> solve_all() {
+		std::vector<std::vector<HeadNode*>> ret;
 		iterate_all(ret);
 		return ret;
 	}
 
 	HeadNode* head;
-	std::vector<ColNode*> cols;
-	std::vector<RowNode*> rows;
+	std::vector<HeadNode*> cols;
+	std::vector<HeadNode*> rows;
 };
 
 #endif

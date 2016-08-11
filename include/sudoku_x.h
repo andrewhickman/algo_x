@@ -78,14 +78,14 @@ inline bool matrix(int j, int i) {
 
 } // namespace constraints
 
-inline std::string format_solution(const std::vector<RowNode*>& solution) {
+inline std::string format_solution(const std::vector<HeadNode*>& solution) {
 	std::string ret;
 	if (solution.empty()) {
 		return ret;
 	}
 	static int grid[6][6];
-	for (RowNode* n : solution) {
-		size_t i = n->num;
+	for (HeadNode* n : solution) {
+		size_t i = n->data;
 		size_t num = (i % 6);
 		size_t col = (i /= 6) % 6;
 		size_t row = (i /= 6) % 6;
@@ -147,7 +147,7 @@ inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 	/* Faster than the basic solve routine for multiple puzzles */
 	SparseMatrix M(MATRIX_H, MATRIX_W, constraints::matrix);
 	int line_count = 0;
-	std::vector<RowNode*> clues;
+	std::vector<HeadNode*> clues;
 	for (std::string puzzle; std::getline(infile, puzzle);) {
 		if (puzzle.size() != 36) {
 			continue;
