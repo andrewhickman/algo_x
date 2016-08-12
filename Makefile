@@ -1,13 +1,13 @@
-#CC := g++
-CC := clang++-3.8 -stdlib=libc++ 
+#CC := g++ -fmax-errors=5
+CC := clang++-3.8 -stdlib=libstdc++ -ferror-limit=5
 SRCDIR := source
 BUILDDIR := build
 TARGET := bin/a.out
- 
+
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -ferror-limit=5 -O3
+CFLAGS := --std=c++1y -Wall -Wextra -Wshadow -pedantic -Werror -O3
 LIB := $(OBJECTS)
 INC := -I include
 
@@ -18,15 +18,18 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
-	@echo "Cleaning..."; 
-	$(RM) -r $(BUILDDIR) $(TARGET)
+	@echo "Cleaning...";
+	$(RM) -r $(BUILDDIR)
 
-tidy:
-	clang-tidy-3.8
+sudoku:
+	$(CC) $(CFLAGS) tests/sudoku.cpp $(INC) $(LIB) -o bin/sudoku
+
+sudoku_benchmark:
+	$(CC) $(CFLAGS) tests/sudoku_benchmark.cpp $(INC) $(LIB) -o bin/sudoku_benchmark
 
 # Tests
-tester:
-	$(CC) $(CFLAGS) test/test.cpp $(INC) $(LIB) -o bin/test
+test:
+	$(CC) $(CFLAGS) tests/test.cpp $(INC) $(LIB) -o bin/test
 
 # Spikes
 ticket:

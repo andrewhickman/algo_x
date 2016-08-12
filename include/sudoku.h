@@ -10,8 +10,7 @@
 #include <string>
 #include <vector>
 
-/*
- *  Allows solving of 9x9 and 6x6 sudokus with optional cross rule
+/*  Allows solving of 9x9 and 6x6 sudokus with optional cross rule
  */
 
 namespace sudoku {
@@ -28,10 +27,12 @@ inline bool is_clue(const int n) {
 }
 
 namespace constraints {
-/*
- *  Defines a set of functions such that f(j1, i1, n1) == f(j2, i2, n2) if and
- *  only if the constraint is not satisfied. Return values in range [0, 81)
+
+/*  Defines a set of functions such that f(j1, i1, n1) == f(j2, i2, n2) if and
+ *  only if the constraint is not satisfied. Return values in range [0, sz^3).
+ *  Note for odd sz values two functions are necessary for the cross constraint.
  */
+
 template<int sz>
 int cell(int j, int i, int) {
 	return i * sz + j;
@@ -51,15 +52,18 @@ int block(int j, int i, int n) {
 	return block_num * sz + n;
 }
 template<int sz>
-int cross(int j, int i, int n) {
+int crossa(int j, int i, int n) {
 	if (j == i) {
-		i = j = n;
-	} else if (j + i == sz - 1) {
-		j = n;
-		i = sz - 1 - n;
+		return (sz + 1) * n;
 	}
 	return j * sz + i;
-	
+}
+template<int sz>
+int crossb(int j, int i, int n) {
+	if (j + i == sz - 1) {
+		return (sz - 1) * (n + 1);
+	}
+	return j * sz + i; 
 }
 
 template<int sz>
@@ -69,7 +73,7 @@ inline bool matrix(int j, int i) {
 	int i_row = (i /= sz) % sz;
 
 	const int sz2 = sz * sz;
-	int constraint_type = (j / sz2) % 5;
+	int constraint_type = (j / sz2);
 
 	switch (constraint_type) {
 		case 0:
@@ -81,8 +85,9 @@ inline bool matrix(int j, int i) {
 		case 3:
 			return j % sz2 == block<sz>(i_col, i_row, i_num);
 		case 4:
-			return j % sz2 == cross<sz>(i_col, i_row, i_num);
-
+			return j % sz2 == crossa<sz>(i_col, i_row, i_num);
+		case 5:
+			return j % sz2 == crossb<sz>(i_col, i_row, i_num);
 	}
 	return false;    // unused
 }
@@ -136,9 +141,6 @@ inline void print_grid<9>(const std::string& puzzle, std::ostream& os) {
 
 template<>
 inline void print_grid<6>(const std::string& puzzle, std::ostream& os) {
-	if (puzzle.size() != 36) {
-		return;
-	}
 	os << "┌───┬───┐\n│";
 	for (int i = 0; i < 6; ++i) {
 		for (int j = 0; j < 6; ++j) {
@@ -163,7 +165,7 @@ inline void solve(const std::string& puzzle) {
 	std::cout << "Solving puzzle:\n";
 	print_grid<sz>(puzzle, std::cout);
 	int height = sz * sz * sz;
-	int width = sz * sz * (use_cross_rule ? 5 : 4);
+	int width = sz * sz * (use_cross_rule ? 6 : 4);
 	SparseMatrix M(height, width,
 		[puzzle](size_t j, size_t i) -> bool {
 			int c = get_num(puzzle[i / sz]);
@@ -185,7 +187,7 @@ template<int sz, bool use_cross_rule = false>
 inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 	/* Faster than the basic solve routine for multiple puzzles */
 	const int sz2 = sz * sz;
-	SparseMatrix M(sz2 * sz, sz2 * (use_cross_rule ? 5 : 4),
+	SparseMatrix M(sz2 * sz, sz2 * (use_cross_rule ? 6 : 4),
 	               constraints::matrix<sz>);
 	int line_count = 0;
 	std::vector<HeadNode*> clues;

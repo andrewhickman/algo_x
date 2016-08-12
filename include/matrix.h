@@ -27,14 +27,14 @@ struct SparseMatrix {
 	void iterate_all(std::vector<std::vector<HeadNode*>>& solutions);
 
 	std::vector<HeadNode*> solve() {
-/* Find a single solution to the exact cover problem. */
+	/* Find a single solution to the exact cover problem. */
 		std::vector<HeadNode*> ret;
 		iterate(ret);
 		return ret;
 	}
 
 	std::vector<std::vector<HeadNode*>> solve_all() {
-/* Find all solutions to the exact cover problem. */
+	/* Find all solutions to the exact cover problem. */
 		std::vector<std::vector<HeadNode*>> ret;
 		iterate_all(ret);
 		return ret;
@@ -43,3 +43,4 @@ struct SparseMatrix {
 };
 
 #endif
+

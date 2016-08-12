@@ -20,7 +20,7 @@ public:
 	void replace_in_row();
 
 protected:
-	Node(HeadNode *col_, HeadNode *row_,
+	Node(HeadNode *col_, HeadNode *row_,       // For use by HeadNode
 	     Node *above_, Node *below_,
 	     Node *left, Node *right);
 };
