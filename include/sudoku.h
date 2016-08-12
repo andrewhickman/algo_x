@@ -34,32 +34,32 @@ namespace constraints {
  */
 
 template<int sz>
-int cell(int j, int i, int) {
+inline int cell(int j, int i, int) {
 	return i * sz + j;
 }
 template<int sz>
-int row(int, int i, int n) {
+inline int row(int, int i, int n) {
 	return i * sz + n;
 }
 template<int sz>
-int col(int j, int, int n) {
+inline int col(int j, int, int n) {
 	return j * sz + n;
 }
 template<int sz>
-int block(int j, int i, int n) {
+inline int block(int j, int i, int n) {
 	static int block_width = (sz == 9 ? 3 : 2);
 	int block_num = 3 * (j / 3) + (i / block_width);
 	return block_num * sz + n;
 }
 template<int sz>
-int crossa(int j, int i, int n) {
+inline int crossa(int j, int i, int n) {
 	if (j == i) {
 		return (sz + 1) * n;
 	}
 	return j * sz + i;
 }
 template<int sz>
-int crossb(int j, int i, int n) {
+inline int crossb(int j, int i, int n) {
 	if (j + i == sz - 1) {
 		return (sz - 1) * (n + 1);
 	}
@@ -176,9 +176,9 @@ inline void solve(const std::string& puzzle) {
 		}
 	);
 	auto solutions = M.solve_all();
-	for (auto sol : solutions) {
+	if (solutions.size() == 1) {
 		std::cout << "Found solution:\n";
-		print_grid<sz>(format_solution<sz>(sol), std::cout);
+		print_grid<sz>(format_solution<sz>(solutions.back()), std::cout);
 	}
 	std::cout << "Total solutions found: " << solutions.size() << '\n';
 }
