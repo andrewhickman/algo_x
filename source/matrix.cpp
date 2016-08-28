@@ -106,11 +106,9 @@ bool SparseMatrix::iterate(std::vector<HeadNode*>& solution) {
 		for (auto it = removed_rows.rbegin(); it != removed_rows.rend(); ++it) {
 			replace_row(*it);
 		}
-		removed_rows.clear();
 		for (auto it = removed_cols.rbegin(); it != removed_cols.rend(); ++it) {
 			replace_col(*it);
 		}
-		removed_cols.clear();
 		if (result) {
 			solution.push_back(r);
 			return true;
