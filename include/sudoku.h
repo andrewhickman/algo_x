@@ -52,14 +52,14 @@ inline int block(int j, int i, int n) {
 	return block_num * sz + n;
 }
 template<int sz>
-inline int crossa(int j, int i, int n) {
+inline int cross1(int j, int i, int n) {
 	if (j == i) {
 		return (sz + 1) * n;
 	}
 	return j * sz + i;
 }
 template<int sz>
-inline int crossb(int j, int i, int n) {
+inline int cross2(int j, int i, int n) {
 	if (j + i == sz - 1) {
 		return (sz - 1) * (n + 1);
 	}
@@ -85,9 +85,9 @@ inline bool matrix(int j, int i) {
 		case 3:
 			return j % sz2 == block<sz>(i_col, i_row, i_num);
 		case 4:
-			return j % sz2 == crossa<sz>(i_col, i_row, i_num);
+			return j % sz2 == cross1<sz>(i_col, i_row, i_num);
 		case 5:
-			return j % sz2 == crossb<sz>(i_col, i_row, i_num);
+			return j % sz2 == cross2<sz>(i_col, i_row, i_num);
 	}
 	return false;    // unused
 }
@@ -190,8 +190,8 @@ inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 	SparseMatrix M(sz2 * sz, sz2 * (use_cross_rule ? 6 : 4),
 	               constraints::matrix<sz>);
 	int line_count = 0;
-	std::vector<HeadNode*> clues;
 	for (std::string puzzle; std::getline(infile, puzzle);) {
+	    std::vector<HeadNode*> clues;
 		if (puzzle.size() != sz2) {
 			continue;
 		}
@@ -216,7 +216,6 @@ inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 		for (auto it = clues.rbegin(); it != clues.rend(); ++it) {
 			M.replace_row(*it);
 		}
-		clues.clear();
 	}
 	return line_count;
 }

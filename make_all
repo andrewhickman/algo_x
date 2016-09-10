@@ -2,3 +2,4 @@ make clean
 make
 make sudoku
 make sudoku_benchmark
+make pentomino_enumerate

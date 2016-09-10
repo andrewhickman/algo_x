@@ -9,37 +9,29 @@
 #include <vector>
 
 struct SparseMatrix {
-	SparseMatrix(size_t height, size_t width,
-	             std::function<bool (size_t, size_t)> pred);
-	~SparseMatrix();
+    SparseMatrix(size_t height, size_t width,
+                 std::function<bool (size_t, size_t)> pred);
 
-	HeadNode* head;
-	std::vector<HeadNode*> cols;
-	std::vector<HeadNode*> rows;
+    SparseMatrix(size_t width);
+    void create_row(size_t data, const std::set<int>& elems);
 
-	void remove_col(HeadNode* n);
-	void remove_row(HeadNode* n);
-	void replace_col(HeadNode* n);
-	void replace_row(HeadNode* n);
-	HeadNode* min_col() const;
+    ~SparseMatrix();
 
-	bool iterate(std::vector<HeadNode*>& solution);
-	void iterate_all(std::vector<std::vector<HeadNode*>>& solutions);
+    HeadNode *head;
+    std::vector<HeadNode*> cols;
+    std::vector<HeadNode*> rows;
 
-	std::vector<HeadNode*> solve() {
-	/* Find a single solution to the exact cover problem. */
-		std::vector<HeadNode*> ret;
-		iterate(ret);
-		return ret;
-	}
+    void remove_col_and_rows(HeadNode*);
+    void replace_col_and_rows(HeadNode*);
+    void remove_row(HeadNode*);
+    void replace_row(HeadNode*);
+    HeadNode *min_col() const;
 
-	std::vector<std::vector<HeadNode*>> solve_all() {
-	/* Find all solutions to the exact cover problem. */
-		std::vector<std::vector<HeadNode*>> ret;
-		iterate_all(ret);
-		return ret;
-	}
+    bool iterate(std::vector<HeadNode*>& solution);
+    void iterate_all(std::vector<std::vector<HeadNode*>>& solutions);
 
+    std::vector<HeadNode*> solve();
+    std::vector<std::vector<HeadNode*>> solve_all();
 };
 
 #endif

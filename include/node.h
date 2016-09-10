@@ -30,7 +30,7 @@ public:
 	HeadNode();                                // Head constructor
 	HeadNode(HeadNode *row_);                  // Col constructor
 	HeadNode(HeadNode *col_, size_t data_);    // Row constructor
-	~HeadNode(); 
+    ~HeadNode();
 
 	size_t data;
 

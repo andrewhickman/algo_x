@@ -9,8 +9,7 @@ int main() {
 	std::ofstream outfile("tests/sudoku/top2365.solutions");
 
 	clock_t t1 = clock();
-	int count = 0;
-	count += sudoku::solve_file<9, false>(infile, outfile);
+	int count = sudoku::solve_file<9, false>(infile, outfile);
 	double dt = double(clock() - t1) / CLOCKS_PER_SEC;
 	if (count != 0) {
 		std::cout << "Solved " << count << " sudoku puzzles in " << dt << " seconds\n";

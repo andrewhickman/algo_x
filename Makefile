@@ -27,13 +27,11 @@ sudoku:
 sudoku_benchmark:
 	$(CC) $(CFLAGS) tests/sudoku_benchmark.cpp $(INC) $(LIB) -o bin/sudoku_benchmark
 
-# Tests
+pentomino_enumerate:
+	$(CC) $(CFLAGS) tests/pentomino_enumerate.cpp $(INC) $(LIB) -o bin/pentomino_enumerate
+
 test:
 	$(CC) $(CFLAGS) tests/test.cpp $(INC) $(LIB) -o bin/test
-
-# Spikes
-ticket:
-	$(CC) $(CFLAGS) spikes/ticket.cpp $(INC) $(LIB) -o bin/ticket
 
 .PHONY:
 	clean

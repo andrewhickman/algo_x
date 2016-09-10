@@ -6,12 +6,6 @@
 int main(int argc, char* argv[]) {
 	std::string puzzle = argc > 1 ? argv[argc-1] : "";
 	bool use_x = false;
-	for (int n = 1; n < argc - 1; ++n) {
-		if (argv[n][0] == '-') {
-
-
-		}
-	}
 	switch (argc) {
 		default:
 		case 3:
@@ -23,7 +17,7 @@ int main(int argc, char* argv[]) {
 			break;
 		case 1:
 		case 0:
-			std::cout << "usage: sudoku [-x] <puzzle>\n";
+			std::cout << "usage: sudoku [options] <puzzle>\n";
 			std::cout << "   x          Use cross rule\n";
 			return 0;
 	}
