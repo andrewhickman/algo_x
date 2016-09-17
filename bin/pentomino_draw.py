@@ -33,6 +33,6 @@ class TileRenderer:
 
 if __name__ == '__main__':
     r = TileRenderer()
-    for tiling in sys.stdin:
+    for num, tiling in enumerate(sys.stdin):
         r.render(tiling)
-        pygame.time.wait(1000)
+        pygame.image.save(r.screen, "images/tiling_" + str(num) + ".png")

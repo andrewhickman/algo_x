@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <functional>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -15,16 +16,14 @@ struct SparseMatrix {
     SparseMatrix(size_t width);
     void create_row(size_t data, const std::set<int>& elems);
 
-    ~SparseMatrix();
-
-    HeadNode *head;
-    std::vector<HeadNode*> cols;
+    std::unique_ptr<HeadNode> head;
+    std::vector<std::unique_ptr<HeadNode>> cols;
     std::vector<HeadNode*> rows;
 
     void remove_col_and_rows(HeadNode*);
     void replace_col_and_rows(HeadNode*);
-    void remove_row(HeadNode*);
-    void replace_row(HeadNode*);
+    void remove_row(Node*);
+    void replace_row(Node*);
     HeadNode *min_col() const;
 
     bool iterate(std::vector<HeadNode*>& solution);
