@@ -1,6 +1,7 @@
 #ifndef _sudoku_h_
 #define _sudoku_h_
 
+#include "digit.h"
 #include "matrix.h"
 
 #include <algorithm>
@@ -10,10 +11,20 @@
 #include <string>
 #include <vector>
 
-/*  Allows solving of 9x9 and 6x6 sudokus with optional cross rule
+/*  
+ *  Allows solving of 9x9 and 6x6 sudokus with optional cross rule
  */
 
 namespace sudoku {
+
+namespace {
+
+enum RowDigits {
+    row, col, num
+};
+enum ColDigits {
+    type, val    
+};
 
 inline int get_num(const char c) {
 	return static_cast<int>(c - '1');
@@ -26,73 +37,66 @@ inline bool is_clue(const int n) {
 	return 0 <= n and n < sz;
 }
 
-namespace constraints {
-
-/*  Defines a set of functions such that f(j1, i1, n1) == f(j2, i2, n2) if and
+/*  
+ *  Defines a set of functions such that f(j1, i1, n1) == f(j2, i2, n2) if and
  *  only if the constraint is not satisfied. Return values in range [0, sz^3).
  *  Note for odd sz values two functions are necessary for the cross constraint.
  */
 
 template<int sz>
-inline int cell(int j, int i, int) {
+inline int cell_constraint(int j, int i, int) {
 	return i * sz + j;
 }
 template<int sz>
-inline int row(int, int i, int n) {
+inline int row_constraint(int, int i, int n) {
 	return i * sz + n;
 }
 template<int sz>
-inline int col(int j, int, int n) {
+inline int col_constraint(int j, int, int n) {
 	return j * sz + n;
 }
 template<int sz>
-inline int block(int j, int i, int n) {
+inline int block_constraint(int j, int i, int n) {
 	static int block_width = (sz == 9 ? 3 : 2);
 	int block_num = 3 * (j / 3) + (i / block_width);
 	return block_num * sz + n;
 }
 template<int sz>
-inline int cross1(int j, int i, int n) {
+inline int cross_constraint_1(int j, int i, int n) {
 	if (j == i) {
 		return (sz + 1) * n;
 	}
 	return j * sz + i;
 }
 template<int sz>
-inline int cross2(int j, int i, int n) {
+inline int cross_constraint_2(int j, int i, int n) {
 	if (j + i == sz - 1) {
 		return (sz - 1) * (n + 1);
 	}
 	return j * sz + i; 
 }
 
+using ConstraintType = int (*)(int, int, int);
+
 template<int sz>
-inline bool matrix(int j, int i) {
-	int i_num = i % sz;
-	int i_col = (i /= sz) % sz;
-	int i_row = (i /= sz) % sz;
+const ConstraintType constraints[] = {
+    cell_constraint<sz>,
+    row_constraint<sz>,
+    col_constraint<sz>,
+    block_constraint<sz>,
+    cross_constraint_1<sz>,
+    cross_constraint_2<sz>,
+};
 
-	const int sz2 = sz * sz;
-	int constraint_type = (j / sz2);
+template<int sz>
+inline bool constraints_matrix(int j_, int i_) {
+    DigitInt<sz, sz, sz> i(i_);
+    DigitInt<6, sz * sz> j(j_);
 
-	switch (constraint_type) {
-		case 0:
-			return j % sz2 == cell<sz>(i_col, i_row, i_num);
-		case 1:
-			return j % sz2 == row<sz>(i_col, i_row, i_num);
-		case 2:
-			return j % sz2 == col<sz>(i_col, i_row, i_num);
-		case 3:
-			return j % sz2 == block<sz>(i_col, i_row, i_num);
-		case 4:
-			return j % sz2 == cross1<sz>(i_col, i_row, i_num);
-		case 5:
-			return j % sz2 == cross2<sz>(i_col, i_row, i_num);
-	}
-	return false;    // unused
+    return j[val] == constraints<sz>[j[type]](i[col], i[row], i[num]);
 }
 
-} // namespace constraints
+}
 
 template<int sz>
 inline std::string format_solution(const std::vector<HeadNode*>& solution) {
@@ -102,11 +106,8 @@ inline std::string format_solution(const std::vector<HeadNode*>& solution) {
 	}
 	static int grid[sz][sz];
 	for (HeadNode* n : solution) {
-		size_t i = n->data;
-		size_t num = (i % sz);
-		size_t col = (i /= sz) % sz;
-		size_t row = (i /= sz) % sz;
-		grid[row][col] = num;
+        DigitInt<9, 9, 9> data(n->data);
+		grid[data.get(row)][data.get(col)] = data.get(num);
 	}
 	for (size_t i = 0; i < sz; ++i) {
 		for (size_t j = 0; j < sz; ++j) {
@@ -172,7 +173,7 @@ inline void solve(const std::string& puzzle) {
 			if (is_clue<sz>(c) and size_t(c) != (i % sz)) {
 				return false;
 			}
-			return constraints::matrix<sz>(j, i);
+			return constraints_matrix<sz>(j, i);
 		}
 	);
 	auto solutions = M.solve_all();
@@ -188,7 +189,7 @@ inline int solve_file(std::ifstream& infile, std::ofstream& outfile) {
 	/* Faster than the basic solve routine for multiple puzzles */
 	const int sz2 = sz * sz;
 	SparseMatrix M(sz2 * sz, sz2 * (use_cross_rule ? 6 : 4),
-	               constraints::matrix<sz>);
+	               constraints_matrix<sz>);
 	int line_count = 0;
 	for (std::string puzzle; std::getline(infile, puzzle);) {
 	    std::vector<HeadNode*> clues;

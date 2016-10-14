@@ -30,6 +30,9 @@ sudoku_benchmark:
 pentomino_enumerate:
 	$(CC) $(CFLAGS) tests/pentomino_enumerate.cpp $(INC) $(LIB) -o bin/pentomino_enumerate
 
+digit_test:
+	$(CC) $(CFLAGS) tests/digit_test.cpp $(INC) $(LIB) -o bin/digit_test
+
 test:
 	$(CC) $(CFLAGS) tests/test.cpp $(INC) $(LIB) -o bin/test
 
